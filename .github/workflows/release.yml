@@ -1,0 +1,29 @@
+name: release
+
+on:
+  push:
+    # Stream Deck versions are four numeric parts, so a prerelease suffix could never validate
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+jobs:
+  check:
+    uses: ./.github/workflows/check.yml
+
+  release:
+    needs: check
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # pack pads the tag's X.Y.Z to Stream Deck's X.Y.Z.0
+      - run: npx sd pack --no-update-check --version "${GITHUB_REF_NAME#v}" --output dist rocks.bythe.focus-mode-switcher.sdPlugin
+      - run: gh release create "$GITHUB_REF_NAME" --generate-notes dist/*.streamDeckPlugin
+        env:
+          GH_TOKEN: ${{ github.token }}
