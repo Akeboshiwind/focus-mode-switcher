@@ -28,8 +28,8 @@ A press shows ⚠ when the key has no Focus chosen, when the Focus Mode Switcher
 ```sh
 npm ci
 npm run build
-npx sd link com.akeboshiwind.focus-mode-switcher.sdPlugin   # once, from the checkout you develop in
-npm run watch                                                # rebuild and restart the plugin on change
+npx sd link rocks.bythe.focus-mode-switcher.sdPlugin   # once, from the checkout you develop in
+npm run watch                                          # rebuild and restart the plugin on change
 ```
 
 Reading Focus state is adapted from Raycast's [focus modes](https://github.com/raycast/extensions/tree/main/extensions/focus-modes) extension (MIT).

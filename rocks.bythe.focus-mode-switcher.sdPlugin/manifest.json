@@ -5,7 +5,7 @@
 	"Actions": [
 		{
 			"Name": "Focus Mode",
-			"UUID": "com.akeboshiwind.focus-mode-switcher.focus-mode",
+			"UUID": "rocks.bythe.focus-mode-switcher.focus-mode",
 			"Icon": "imgs/actions/focus-mode/icon",
 			"Tooltip": "Shows whether a macOS Focus mode is on, and turns it on when pressed.",
 			"PropertyInspectorPath": "ui/focus-mode.html",
@@ -43,5 +43,5 @@
 		"Version": "24",
 		"Debug": "enabled"
 	},
-	"UUID": "com.akeboshiwind.focus-mode-switcher"
+	"UUID": "rocks.bythe.focus-mode-switcher"
 }

@@ -9,7 +9,7 @@ npm ci                # in a new worktree; never symlink another checkout's node
 npm test              # unit tests
 npm run typecheck     # the build doesn't fail on type errors
 npm run build         # bundle to *.sdPlugin/bin
-npx sd validate com.akeboshiwind.focus-mode-switcher.sdPlugin
+npx sd validate rocks.bythe.focus-mode-switcher.sdPlugin
 ```
 
 ## Landing work

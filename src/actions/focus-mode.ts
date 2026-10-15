@@ -20,7 +20,7 @@ const LIT = 1;
 const NO_ACCESS_ICON = { symbol: "lock.fill", tint: "systemRedColor" };
 const UNSUPPORTED_VERSION_ICON = { symbol: "exclamationmark.triangle", tint: "systemYellowColor" };
 
-@action({ UUID: "com.akeboshiwind.focus-mode-switcher.focus-mode" })
+@action({ UUID: "rocks.bythe.focus-mode-switcher.focus-mode" })
 export class FocusModeKey extends SingletonAction<Settings> {
 	override async onWillAppear(ev: WillAppearEvent<Settings>): Promise<void> {
 		await showFocus(ev.action, ev.payload.settings, await readFocus());
