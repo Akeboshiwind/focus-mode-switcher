@@ -1,6 +1,6 @@
 import { watch } from "node:fs";
 
-import { DATABASE_DIR } from "./modes";
+import { DATABASE_DIR } from "./focus";
 
 /**
  * Calls `onChange` whenever a file in the DoNotDisturb database changes.

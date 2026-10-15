@@ -8,9 +8,8 @@ import streamDeck, {
 	type Action,
 } from "@elgato/streamdeck";
 
-import { readActiveModeId } from "../focus/active";
+import { readFocus, type Focus } from "../focus/focus";
 import { renderIcon } from "../focus/icon";
-import { readModes, type FocusMode } from "../focus/modes";
 import { enableFocus, focusNameFor, installShortcut } from "../focus/shortcut";
 
 type Settings = { modeId?: string };
@@ -18,18 +17,22 @@ type Settings = { modeId?: string };
 const DIMMED = 0;
 const LIT = 1;
 
+const NO_ACCESS_ICON = { symbol: "lock.fill", tint: "systemRedColor" };
+const UNSUPPORTED_VERSION_ICON = { symbol: "exclamationmark.triangle", tint: "systemYellowColor" };
+
 @action({ UUID: "com.akeboshiwind.focus-mode-switcher.focus-mode" })
 export class FocusModeKey extends SingletonAction<Settings> {
 	override async onWillAppear(ev: WillAppearEvent<Settings>): Promise<void> {
-		await showMode(ev.action, ev.payload.settings, ...(await readFocus()));
+		await showFocus(ev.action, ev.payload.settings, await readFocus());
 	}
 
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<Settings>): Promise<void> {
-		await showMode(ev.action, ev.payload.settings, ...(await readFocus()));
+		await showFocus(ev.action, ev.payload.settings, await readFocus());
 	}
 
 	override async onKeyDown(ev: KeyDownEvent<Settings>): Promise<void> {
-		const focusName = focusNameFor(await readModes(), ev.payload.settings.modeId);
+		const focus = await readFocus();
+		const focusName = focus.kind === "ok" ? focusNameFor(focus.modes, ev.payload.settings.modeId) : undefined;
 		if (focusName === undefined) return ev.action.showAlert();
 		try {
 			await enableFocus(focusName);
@@ -41,9 +44,9 @@ export class FocusModeKey extends SingletonAction<Settings> {
 
 	override async onSendToPlugin(ev: SendToPluginEvent<{ event?: string }, Settings>): Promise<void> {
 		switch (ev.payload.event) {
-			// The property inspector's `sdpi-select` datasource request.
 			case "getModes": {
-				const modes = await readModes();
+				const focus = await readFocus();
+				const modes = focus.kind === "ok" ? focus.modes : [];
 				await streamDeck.ui.sendToPropertyInspector({
 					event: "getModes",
 					items: modes.map((mode) => ({ label: mode.name, value: mode.id })),
@@ -58,24 +61,28 @@ export class FocusModeKey extends SingletonAction<Settings> {
 
 	async refresh(): Promise<void> {
 		const focus = await readFocus();
-		await Promise.all(this.actions.map(async (key) => showMode(key, await key.getSettings(), ...focus)).toArray());
+		await Promise.all(this.actions.map(async (key) => showFocus(key, await key.getSettings(), focus)).toArray());
 	}
 }
 
-function readFocus(): Promise<[FocusMode[], string | undefined]> {
-	return Promise.all([readModes(), readActiveModeId()]);
-}
-
-async function showMode(key: Action<Settings>, { modeId }: Settings, modes: FocusMode[], activeModeId: string | undefined): Promise<void> {
+async function showFocus(key: Action<Settings>, { modeId }: Settings, focus: Focus): Promise<void> {
 	if (!key.isKey()) return;
-	const mode = modes.find((m) => m.id === modeId);
-	if (mode === undefined) {
-		await key.setImage();
-		await key.setState(DIMMED);
-		return;
+	switch (focus.kind) {
+		case "no-access":
+			return key.setImage(await renderIcon(NO_ACCESS_ICON, true));
+		case "unsupported-version":
+			return key.setImage(await renderIcon(UNSUPPORTED_VERSION_ICON, true));
+		case "ok": {
+			const mode = focus.modes.find((m) => m.id === modeId);
+			if (mode === undefined) {
+				await key.setImage();
+				await key.setState(DIMMED);
+				return;
+			}
+			const [dimmed, lit] = await Promise.all([renderIcon(mode, false), renderIcon(mode, true)]);
+			await key.setImage(dimmed, { state: DIMMED });
+			await key.setImage(lit, { state: LIT });
+			await key.setState(mode.id === focus.activeModeId ? LIT : DIMMED);
+		}
 	}
-	const [dimmed, lit] = await Promise.all([renderIcon(mode, false), renderIcon(mode, true)]);
-	await key.setImage(dimmed, { state: DIMMED });
-	await key.setImage(lit, { state: LIT });
-	await key.setState(mode.id === activeModeId ? LIT : DIMMED);
 }

@@ -1,10 +1,5 @@
 // Adapted from Raycast's focus-modes extension (MIT):
 // https://github.com/raycast/extensions/blob/main/extensions/focus-modes/src/focus-state.ts
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-
-import { DATABASE_DIR } from "./modes";
-
 interface Assertions {
 	data?: {
 		storeAssertionRecords?: {
@@ -31,8 +26,4 @@ export function parseActiveModeId(assertions: Assertions): string | undefined {
 		.filter((record) => record.start >= turnedOffAt)
 		.sort((a, b) => b.start - a.start);
 	return newest?.modeId;
-}
-
-export async function readActiveModeId(): Promise<string | undefined> {
-	return parseActiveModeId(JSON.parse(await readFile(join(DATABASE_DIR, "Assertions.json"), "utf8")));
 }
