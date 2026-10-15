@@ -1,0 +1,70 @@
+{
+  "data": [
+    {
+      "modeConfigurations": {
+        "com.apple.donotdisturb.mode.default": {
+          "mode": {
+            "name": "Do Not Disturb",
+            "modeIdentifier": "com.apple.donotdisturb.mode.default",
+            "symbolImageName": "moon.fill",
+            "tintColorName": "systemIndigoColor",
+            "visibility": 0
+          },
+          "triggers": {
+            "triggers": []
+          }
+        },
+        "com.apple.donotdisturb.mode.guitarsfill": {
+          "mode": {
+            "name": "Rest",
+            "modeIdentifier": "com.apple.donotdisturb.mode.guitarsfill",
+            "symbolImageName": "guitars.fill",
+            "tintColorName": "systemOrangeColor",
+            "visibility": 0
+          },
+          "triggers": {
+            "triggers": [
+              {
+                "class": "DNDModeConfigurationSmartTrigger",
+                "enabledSetting": 1
+              }
+            ]
+          }
+        },
+        "com.apple.focus.work": {
+          "mode": {
+            "name": "Work",
+            "modeIdentifier": "com.apple.focus.work",
+            "symbolImageName": "person.lanyardcard.fill",
+            "tintColorName": "systemBlueColor",
+            "visibility": 1
+          },
+          "triggers": {
+            "triggers": []
+          }
+        },
+        "com.apple.donotdisturb.mode.bookmarkfill": {
+          "mode": {
+            "name": "Work",
+            "modeIdentifier": "com.apple.donotdisturb.mode.bookmarkfill",
+            "symbolImageName": "bookmark.fill",
+            "tintColorName": "systemBlueColor",
+            "visibility": 0
+          },
+          "triggers": {
+            "triggers": [
+              {
+                "class": "DNDModeConfigurationSmartTrigger",
+                "enabledSetting": 1
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "header": {
+    "version": 3,
+    "timestamp": 813462260.715865
+  }
+}
