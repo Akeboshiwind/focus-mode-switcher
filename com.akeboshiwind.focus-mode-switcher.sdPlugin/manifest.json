@@ -7,7 +7,7 @@
 			"Name": "Focus Mode",
 			"UUID": "com.akeboshiwind.focus-mode-switcher.focus-mode",
 			"Icon": "imgs/actions/focus-mode/icon",
-			"Tooltip": "Shows a macOS Focus mode.",
+			"Tooltip": "Shows whether a macOS Focus mode is on, and turns it on when pressed.",
 			"PropertyInspectorPath": "ui/focus-mode.html",
 			"Controllers": [
 				"Keypad"

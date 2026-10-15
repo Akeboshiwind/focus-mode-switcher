@@ -1,8 +1,17 @@
-import streamDeck, { action, DidReceiveSettingsEvent, SendToPluginEvent, SingletonAction, WillAppearEvent, type Action } from "@elgato/streamdeck";
+import streamDeck, {
+	action,
+	DidReceiveSettingsEvent,
+	KeyDownEvent,
+	SendToPluginEvent,
+	SingletonAction,
+	WillAppearEvent,
+	type Action,
+} from "@elgato/streamdeck";
 
 import { readActiveModeId } from "../focus/active";
 import { renderIcon } from "../focus/icon";
 import { readModes, type FocusMode } from "../focus/modes";
+import { enableFocus, focusNameFor, installShortcut } from "../focus/shortcut";
 
 type Settings = { modeId?: string };
 
@@ -19,16 +28,32 @@ export class FocusModeKey extends SingletonAction<Settings> {
 		await showMode(ev.action, ev.payload.settings, ...(await readFocus()));
 	}
 
-	/**
-	 * Answers the property inspector's `sdpi-select` datasource request.
-	 */
+	override async onKeyDown(ev: KeyDownEvent<Settings>): Promise<void> {
+		const focusName = focusNameFor(await readModes(), ev.payload.settings.modeId);
+		if (focusName === undefined) return ev.action.showAlert();
+		try {
+			await enableFocus(focusName);
+		} catch (error) {
+			streamDeck.logger.error(`Turning on "${focusName}" failed`, error);
+			await ev.action.showAlert();
+		}
+	}
+
 	override async onSendToPlugin(ev: SendToPluginEvent<{ event?: string }, Settings>): Promise<void> {
-		if (ev.payload.event !== "getModes") return;
-		const modes = await readModes();
-		await streamDeck.ui.sendToPropertyInspector({
-			event: "getModes",
-			items: modes.map((mode) => ({ label: mode.name, value: mode.id })),
-		});
+		switch (ev.payload.event) {
+			// The property inspector's `sdpi-select` datasource request.
+			case "getModes": {
+				const modes = await readModes();
+				await streamDeck.ui.sendToPropertyInspector({
+					event: "getModes",
+					items: modes.map((mode) => ({ label: mode.name, value: mode.id })),
+				});
+				break;
+			}
+			case "installShortcut":
+				await installShortcut();
+				break;
+		}
 	}
 
 	async refresh(): Promise<void> {

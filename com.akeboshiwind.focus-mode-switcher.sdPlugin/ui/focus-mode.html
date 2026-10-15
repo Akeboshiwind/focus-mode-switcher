@@ -10,5 +10,13 @@
 		<sdpi-item label="Focus mode">
 			<sdpi-select setting="modeId" datasource="getModes" loading="Reading Focus modes…" placeholder="Choose a mode"></sdpi-select>
 		</sdpi-item>
+		<sdpi-item label="Shortcut">
+			<sdpi-button id="install-shortcut">Install shortcut</sdpi-button>
+		</sdpi-item>
+		<script>
+			document.getElementById("install-shortcut").addEventListener("click", () => {
+				SDPIComponents.streamDeckClient.send("sendToPlugin", { event: "installShortcut" });
+			});
+		</script>
 	</body>
 </html>
