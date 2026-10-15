@@ -14,7 +14,7 @@ type GlobalSettings = { updateOpenedFor?: string };
 /**
  * Downloads the release's `.streamDeckPlugin` and opens it, so Stream Deck asks the user whether to install it.
  */
-async function openInstaller(release: Release): Promise<void> {
+export async function openInstaller(release: Release): Promise<void> {
 	const response = await fetch(release.assetUrl, { signal: AbortSignal.timeout(60_000) });
 	if (!response.ok) throw new Error(`${release.assetUrl} returned ${response.status}`);
 	const file = join(await mkdtemp(join(tmpdir(), "focus-mode-switcher-")), ASSET);

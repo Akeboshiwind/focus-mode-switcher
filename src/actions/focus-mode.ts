@@ -11,6 +11,8 @@ import streamDeck, {
 import { readFocus, type Focus } from "../focus/focus";
 import { renderIcon } from "../focus/icon";
 import { enableFocus, focusNameFor, installShortcut } from "../focus/shortcut";
+import type { Release } from "../update/release";
+import { openInstaller } from "../update/updater";
 
 type Settings = { modeId?: string };
 
@@ -22,16 +24,16 @@ const UNSUPPORTED_VERSION_ICON = { symbol: "exclamationmark.triangle", tint: "sy
 
 @action({ UUID: "rocks.bythe.focus-mode-switcher.focus-mode" })
 export class FocusModeKey extends SingletonAction<Settings> {
-	constructor(private readonly updateAvailable: () => boolean) {
+	constructor(private readonly update: () => Release | undefined) {
 		super();
 	}
 
 	override async onWillAppear(ev: WillAppearEvent<Settings>): Promise<void> {
-		await showFocus(ev.action, ev.payload.settings, await readFocus(), this.updateAvailable());
+		await showFocus(ev.action, ev.payload.settings, await readFocus(), this.update() !== undefined);
 	}
 
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<Settings>): Promise<void> {
-		await showFocus(ev.action, ev.payload.settings, await readFocus(), this.updateAvailable());
+		await showFocus(ev.action, ev.payload.settings, await readFocus(), this.update() !== undefined);
 	}
 
 	override async onKeyDown(ev: KeyDownEvent<Settings>): Promise<void> {
@@ -60,12 +62,20 @@ export class FocusModeKey extends SingletonAction<Settings> {
 			case "installShortcut":
 				await installShortcut();
 				break;
+			case "getUpdate":
+				await streamDeck.ui.sendToPropertyInspector({ event: "getUpdate", tag: this.update()?.tag ?? null });
+				break;
+			case "installUpdate": {
+				const update = this.update();
+				if (update !== undefined) await openInstaller(update);
+				break;
+			}
 		}
 	}
 
 	async refresh(): Promise<void> {
 		const focus = await readFocus();
-		const badged = this.updateAvailable();
+		const badged = this.update() !== undefined;
 		await Promise.all(this.actions.map(async (key) => showFocus(key, await key.getSettings(), focus, badged)).toArray());
 	}
 }

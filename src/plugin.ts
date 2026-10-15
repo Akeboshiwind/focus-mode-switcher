@@ -13,7 +13,7 @@ streamDeck.logger.setLevel("trace");
 
 let update: Release | undefined;
 
-const focusModeKey = new FocusModeKey(() => update !== undefined);
+const focusModeKey = new FocusModeKey(() => update);
 streamDeck.actions.registerAction(focusModeKey);
 
 const refresh = () => focusModeKey.refresh().catch((error) => streamDeck.logger.error("Refreshing Focus Mode keys failed", error));
