@@ -1,12 +1,18 @@
 import streamDeck from "@elgato/streamdeck";
 
-import { IncrementCounter } from "./actions/increment-counter";
+import { FocusModeKey } from "./actions/focus-mode";
+import { watchDatabase } from "./focus/watch";
 
-// We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
+/** A scheduled Focus window opens and closes without touching the DB, so nothing but time notices it. */
+const SCHEDULE_CHECK_MS = 10_000;
+
 streamDeck.logger.setLevel("trace");
 
-// Register the increment action.
-streamDeck.actions.registerAction(new IncrementCounter());
+const focusModeKey = new FocusModeKey();
+streamDeck.actions.registerAction(focusModeKey);
 
-// Finally, connect to the Stream Deck.
+const refresh = () => focusModeKey.refresh().catch((error) => streamDeck.logger.error("Refreshing Focus Mode keys failed", error));
+watchDatabase(refresh, (error) => streamDeck.logger.error("Watching the DoNotDisturb database failed", error));
+setInterval(refresh, SCHEDULE_CHECK_MS);
+
 streamDeck.connect();

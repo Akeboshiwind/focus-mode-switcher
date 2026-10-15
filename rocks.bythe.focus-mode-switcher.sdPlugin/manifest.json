@@ -4,18 +4,22 @@
 	"Author": "Akeboshiwind",
 	"Actions": [
 		{
-			"Name": "Counter",
-			"UUID": "com.akeboshiwind.focus-mode-switcher.increment",
-			"Icon": "imgs/actions/counter/icon",
-			"Tooltip": "Displays a count, which increments by one on press.",
-			"PropertyInspectorPath": "ui/increment-counter.html",
+			"Name": "Focus Mode",
+			"UUID": "rocks.bythe.focus-mode-switcher.focus-mode",
+			"Icon": "imgs/actions/focus-mode/icon",
+			"Tooltip": "Shows whether a macOS Focus mode is on, and turns it on when pressed.",
+			"PropertyInspectorPath": "ui/focus-mode.html",
 			"Controllers": [
 				"Keypad"
 			],
 			"States": [
 				{
-					"Image": "imgs/actions/counter/key",
-					"TitleAlignment": "middle"
+					"Image": "imgs/actions/focus-mode/key-off",
+					"ShowTitle": false
+				},
+				{
+					"Image": "imgs/actions/focus-mode/key-on",
+					"ShowTitle": false
 				}
 			]
 		}
@@ -33,15 +37,11 @@
 		{
 			"Platform": "mac",
 			"MinimumVersion": "12"
-		},
-		{
-			"Platform": "windows",
-			"MinimumVersion": "10"
 		}
 	],
 	"Nodejs": {
 		"Version": "24",
 		"Debug": "enabled"
 	},
-	"UUID": "com.akeboshiwind.focus-mode-switcher"
+	"UUID": "rocks.bythe.focus-mode-switcher"
 }

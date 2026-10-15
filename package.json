@@ -1,7 +1,9 @@
 {
     "scripts": {
         "build": "rollup -c",
-        "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart com.akeboshiwind.focus-mode-switcher\""
+        "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart rocks.bythe.focus-mode-switcher\"",
+        "test": "node --import tsx --test \"src/**/*.test.ts\"",
+        "typecheck": "tsc --noEmit"
     },
     "type": "module",
     "devDependencies": {
@@ -14,6 +16,7 @@
         "@types/node": "~24.1.0",
         "rollup": "^4.0.2",
         "tslib": "^2.6.2",
+        "tsx": "^4.23.15",
         "typescript": "^5.2.2"
     },
     "dependencies": {
