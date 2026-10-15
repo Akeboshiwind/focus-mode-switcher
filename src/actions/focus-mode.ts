@@ -1,7 +1,8 @@
 import streamDeck, { action, DidReceiveSettingsEvent, SendToPluginEvent, SingletonAction, WillAppearEvent, type Action } from "@elgato/streamdeck";
 
 import { readActiveModeId } from "../focus/active";
-import { readModes } from "../focus/modes";
+import { renderIcon } from "../focus/icon";
+import { readModes, type FocusMode } from "../focus/modes";
 
 type Settings = { modeId?: string };
 
@@ -11,11 +12,11 @@ const LIT = 1;
 @action({ UUID: "com.akeboshiwind.focus-mode-switcher.focus-mode" })
 export class FocusModeKey extends SingletonAction<Settings> {
 	override async onWillAppear(ev: WillAppearEvent<Settings>): Promise<void> {
-		await showState(ev.action, ev.payload.settings, await readActiveModeId());
+		await showMode(ev.action, ev.payload.settings, ...(await readFocus()));
 	}
 
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<Settings>): Promise<void> {
-		await showState(ev.action, ev.payload.settings, await readActiveModeId());
+		await showMode(ev.action, ev.payload.settings, ...(await readFocus()));
 	}
 
 	/**
@@ -31,12 +32,25 @@ export class FocusModeKey extends SingletonAction<Settings> {
 	}
 
 	async refresh(): Promise<void> {
-		const activeModeId = await readActiveModeId();
-		await Promise.all(this.actions.map(async (key) => showState(key, await key.getSettings(), activeModeId)).toArray());
+		const focus = await readFocus();
+		await Promise.all(this.actions.map(async (key) => showMode(key, await key.getSettings(), ...focus)).toArray());
 	}
 }
 
-async function showState(key: Action<Settings>, { modeId }: Settings, activeModeId: string | undefined): Promise<void> {
+function readFocus(): Promise<[FocusMode[], string | undefined]> {
+	return Promise.all([readModes(), readActiveModeId()]);
+}
+
+async function showMode(key: Action<Settings>, { modeId }: Settings, modes: FocusMode[], activeModeId: string | undefined): Promise<void> {
 	if (!key.isKey()) return;
-	await key.setState(modeId !== undefined && modeId === activeModeId ? LIT : DIMMED);
+	const mode = modes.find((m) => m.id === modeId);
+	if (mode === undefined) {
+		await key.setImage();
+		await key.setState(DIMMED);
+		return;
+	}
+	const [dimmed, lit] = await Promise.all([renderIcon(mode, false), renderIcon(mode, true)]);
+	await key.setImage(dimmed, { state: DIMMED });
+	await key.setImage(lit, { state: LIT });
+	await key.setState(mode.id === activeModeId ? LIT : DIMMED);
 }

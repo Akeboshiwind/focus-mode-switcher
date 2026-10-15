@@ -8,9 +8,9 @@ const fixture = JSON.parse(readFileSync(new URL("fixtures/ModeConfigurations.jso
 
 test("modes are keyed by modeIdentifier", () => {
 	assert.deepEqual(parseModes(fixture), [
-		{ id: "com.apple.donotdisturb.mode.default", name: "Do Not Disturb" },
-		{ id: "com.apple.donotdisturb.mode.guitarsfill", name: "Rest" },
-		{ id: "com.apple.donotdisturb.mode.bookmarkfill", name: "Work" },
+		{ id: "com.apple.donotdisturb.mode.default", name: "Do Not Disturb", symbol: "moon.fill", tint: "systemIndigoColor" },
+		{ id: "com.apple.donotdisturb.mode.guitarsfill", name: "Rest", symbol: "guitars.fill", tint: "systemOrangeColor" },
+		{ id: "com.apple.donotdisturb.mode.bookmarkfill", name: "Work", symbol: "bookmark.fill", tint: "systemBlueColor" },
 	]);
 });
 
