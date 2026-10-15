@@ -9,7 +9,7 @@ const FALLBACK_SYMBOL = "circle.fill";
 const DIMMED_ALPHA = 0.3;
 
 const RENDER = String.raw`
-function run([symbolName, tintName, alphaText]) {
+function run([symbolName, tintName, alphaText, badgedText]) {
 	ObjC.import("AppKit");
 	const alpha = Number(alphaText);
 	const size = 144;
@@ -34,28 +34,35 @@ function run([symbolName, tintName, alphaText]) {
 	const { width, height } = glyph.size;
 	glyph.drawInRectFromRectOperationFraction($.NSMakeRect((size - width) / 2, (size - height) / 2, width, height), $.NSZeroRect, 2, alpha);
 
+	if (badgedText === "true") {
+		$.NSColor.whiteColor.setFill;
+		$.NSBezierPath.bezierPathWithOvalInRect($.NSMakeRect(98, 98, 32, 32)).fill;
+		$.NSColor.systemRedColor.setFill;
+		$.NSBezierPath.bezierPathWithOvalInRect($.NSMakeRect(102, 102, 24, 24)).fill;
+	}
+
 	$.NSGraphicsContext.restoreGraphicsState;
 	return rep.representationUsingTypeProperties(4, $()).base64EncodedStringWithOptions(0).js;
 }`;
 
-async function render(symbol: string, tint: string, alpha: number): Promise<string> {
-	const { stdout } = await execFileAsync("osascript", ["-l", "JavaScript", "-e", RENDER, symbol, tint, String(alpha)]);
+async function render(symbol: string, tint: string, alpha: number, badged: boolean): Promise<string> {
+	const { stdout } = await execFileAsync("osascript", ["-l", "JavaScript", "-e", RENDER, symbol, tint, String(alpha), String(badged)]);
 	return stdout.trim();
 }
 
 const cache = new Map<string, Promise<string>>();
 
 /**
- * The key image for a mode, as a PNG data URI: in its colour when lit, faded when dimmed.
+ * The key image for a mode, as a PNG data URI: in its colour when lit, faded when dimmed, with a red dot in the corner when badged.
  */
-export function renderIcon({ symbol, tint }: Pick<FocusMode, "symbol" | "tint">, lit: boolean): Promise<string> {
-	const key = `${symbol}|${tint}|${lit}`;
+export function renderIcon({ symbol, tint }: Pick<FocusMode, "symbol" | "tint">, lit: boolean, badged: boolean): Promise<string> {
+	const key = `${symbol}|${tint}|${lit}|${badged}`;
 	let icon = cache.get(key);
 	if (icon === undefined) {
 		const alpha = lit ? 1 : DIMMED_ALPHA;
 		const tintName = tint ?? "systemGrayColor";
-		icon = render(symbol ?? FALLBACK_SYMBOL, tintName, alpha)
-			.then(async (png) => png || render(FALLBACK_SYMBOL, tintName, alpha))
+		icon = render(symbol ?? FALLBACK_SYMBOL, tintName, alpha, badged)
+			.then(async (png) => png || render(FALLBACK_SYMBOL, tintName, alpha, badged))
 			.then((png) => `data:image/png;base64,${png}`);
 		icon.catch(() => cache.delete(key));
 		cache.set(key, icon);

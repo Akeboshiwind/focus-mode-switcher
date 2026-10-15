@@ -10,19 +10,30 @@ const png = (dataUri: string) => {
 	return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20), bytes };
 };
 
+const size = (dataUri: string) => {
+	const { width, height } = png(dataUri);
+	return { width, height };
+};
+
 test("a mode's SF Symbol renders as a 144px key image", async () => {
-	const { width, height } = png(await renderIcon({ symbol: "guitars.fill", tint: "systemOrangeColor" }, true));
-	assert.deepEqual({ width, height }, { width: 144, height: 144 });
+	assert.deepEqual(size(await renderIcon({ symbol: "guitars.fill", tint: "systemOrangeColor" }, true, false)), { width: 144, height: 144 });
 });
 
 test("the dimmed image differs from the lit one", async () => {
 	const mode = { symbol: "guitars.fill", tint: "systemOrangeColor" };
-	assert.notEqual(await renderIcon(mode, true), await renderIcon(mode, false));
+	assert.notEqual(await renderIcon(mode, true, false), await renderIcon(mode, false, false));
 });
 
 test("an emoji mode, which has no SF Symbol, gets the fallback icon", async () => {
-	const emoji = await renderIcon({ symbol: "emoji.face.grinning", tint: "systemBlueColor" }, true);
-	const unknown = await renderIcon({ symbol: "not.a.symbol", tint: "systemBlueColor" }, true);
+	const emoji = await renderIcon({ symbol: "emoji.face.grinning", tint: "systemBlueColor" }, true, false);
+	const unknown = await renderIcon({ symbol: "not.a.symbol", tint: "systemBlueColor" }, true, false);
 	assert.equal(emoji, unknown);
 	png(emoji);
+});
+
+test("a badged icon, shown while an update is available, differs from the plain one", async () => {
+	const mode = { symbol: "guitars.fill", tint: "systemOrangeColor" };
+	const badged = await renderIcon(mode, true, true);
+	assert.notEqual(badged, await renderIcon(mode, true, false));
+	assert.deepEqual(size(badged), { width: 144, height: 144 });
 });

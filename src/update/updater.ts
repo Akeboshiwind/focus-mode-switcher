@@ -23,15 +23,21 @@ async function openInstaller(release: Release): Promise<void> {
 }
 
 /**
- * Opens the installer for a release newer than `runningVersion`, at most once per release.
- * Rejects when GitHub or the download can't be reached.
+ * The release newer than `runningVersion`, if there is one, after opening its installer at most once per release.
+ * Rejects when GitHub can't be reached; a failed download is logged and retried on the next check.
  */
-export async function checkForUpdate(runningVersion: string): Promise<void> {
+export async function checkForUpdate(runningVersion: string): Promise<Release | undefined> {
 	const latest = await fetchLatestRelease();
 	const update = latest && newerRelease(latest, runningVersion);
-	if (update === undefined) return;
+	if (update === undefined) return undefined;
 	const settings = await streamDeck.settings.getGlobalSettings<GlobalSettings>();
-	if (settings.updateOpenedFor === update.tag) return;
-	await openInstaller(update);
-	await streamDeck.settings.setGlobalSettings<GlobalSettings>({ ...settings, updateOpenedFor: update.tag });
+	if (settings.updateOpenedFor !== update.tag) {
+		try {
+			await openInstaller(update);
+			await streamDeck.settings.setGlobalSettings<GlobalSettings>({ ...settings, updateOpenedFor: update.tag });
+		} catch (error) {
+			streamDeck.logger.debug(`Opening the installer for ${update.tag} failed`, error);
+		}
+	}
+	return update;
 }
