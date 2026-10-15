@@ -14,8 +14,12 @@
 			],
 			"States": [
 				{
-					"Image": "imgs/actions/focus-mode/key",
-					"TitleAlignment": "bottom"
+					"Image": "imgs/actions/focus-mode/key-off",
+					"ShowTitle": false
+				},
+				{
+					"Image": "imgs/actions/focus-mode/key-on",
+					"ShowTitle": false
 				}
 			]
 		}
