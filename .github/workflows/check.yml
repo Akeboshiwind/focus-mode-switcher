@@ -1,0 +1,23 @@
+name: check
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_call:
+
+jobs:
+  check:
+    # src/focus/icon.ts renders SF Symbols through osascript, which only macOS has
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx sd validate --no-update-check rocks.bythe.focus-mode-switcher.sdPlugin
