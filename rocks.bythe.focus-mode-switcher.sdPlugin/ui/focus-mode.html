@@ -13,9 +13,25 @@
 		<sdpi-item label="Shortcut">
 			<sdpi-button id="install-shortcut">Install shortcut</sdpi-button>
 		</sdpi-item>
+		<sdpi-item id="update" label="Update" style="display: none">
+			<sdpi-button id="install-update">Install update</sdpi-button>
+		</sdpi-item>
 		<script>
+			const { streamDeckClient } = SDPIComponents;
+
 			document.getElementById("install-shortcut").addEventListener("click", () => {
-				SDPIComponents.streamDeckClient.send("sendToPlugin", { event: "installShortcut" });
+				streamDeckClient.send("sendToPlugin", { event: "installShortcut" });
+			});
+
+			streamDeckClient.sendToPropertyInspector.subscribe(({ payload }) => {
+				if (payload?.event !== "getUpdate" || payload.tag === null) return;
+				document.getElementById("install-update").textContent = `Install ${payload.tag}`;
+				document.getElementById("update").style.display = "";
+			});
+			streamDeckClient.send("sendToPlugin", { event: "getUpdate" });
+
+			document.getElementById("install-update").addEventListener("click", () => {
+				streamDeckClient.send("sendToPlugin", { event: "installUpdate" });
 			});
 		</script>
 	</body>

@@ -6,7 +6,9 @@ A **Focus Mode** key is bound to one Focus. It shows that Focus's icon and colou
 
 ## Install
 
-Download the `.streamDeckPlugin` from the [latest release](https://github.com/Akeboshiwind/focus-mode-switcher/releases/latest) and double-click it; Stream Deck installs it. Install a newer release the same way to update.
+Download the `.streamDeckPlugin` from the [latest release](https://github.com/Akeboshiwind/focus-mode-switcher/releases/latest) and double-click it; Stream Deck installs it.
+
+The plugin checks for a newer release when it starts and once a day. When there is one, it opens Stream Deck's install prompt once; until it's installed, keys show a red dot and their settings show an **Install** button.
 
 ## Setup
 
@@ -24,6 +26,7 @@ Download the `.streamDeckPlugin` from the [latest release](https://github.com/Ak
 | The Focus's icon, faded | That Focus is off |
 | Red lock | Stream Deck doesn't have Full Disk Access |
 | Yellow warning | macOS stores Focus state in a format this plugin doesn't know yet |
+| Red dot in the corner | A newer version of the plugin is available |
 
 A press shows ⚠ when the key has no Focus chosen, when the Focus Mode Switcher shortcut is missing, or when two Focuses share the key's Focus's name — Shortcuts picks a Focus by name, so rename one.
 
