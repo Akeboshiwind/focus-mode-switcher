@@ -46,7 +46,7 @@ async function readDatabaseFile(file: DatabaseFile) {
 export async function readFocus(): Promise<Focus> {
 	try {
 		const [configurations, assertions] = await Promise.all([readDatabaseFile("ModeConfigurations.json"), readDatabaseFile("Assertions.json")]);
-		return { kind: "ok", modes: parseModes(configurations), activeModeId: parseActiveModeId(assertions) };
+		return { kind: "ok", modes: parseModes(configurations), activeModeId: parseActiveModeId(configurations, assertions, new Date()) };
 	} catch (error) {
 		return focusFailure(error);
 	}
