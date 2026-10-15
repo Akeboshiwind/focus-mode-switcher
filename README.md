@@ -4,6 +4,10 @@ Stream Deck plugin that shows and switches macOS Focus modes.
 
 A **Focus Mode** key is bound to one Focus. It shows that Focus's icon and colour, bright while the Focus is on and faded while it's off, and pressing it turns the Focus on.
 
+## Install
+
+Download the `.streamDeckPlugin` from the [latest release](https://github.com/Akeboshiwind/focus-mode-switcher/releases/latest) and double-click it; Stream Deck installs it. Install a newer release the same way to update.
+
 ## Setup
 
 1. **Give Stream Deck Full Disk Access** — System Settings → Privacy & Security → Full Disk Access → add Elgato Stream Deck, then quit and reopen it.
